@@ -1,172 +1,214 @@
 
 #include "Game.h"
+#include "Color.h"
+#include "Utils.h"
 #include <Windows.h>
 #include <iostream>
 #include <vector>
 #include <string>
+#include <io.h>
+#include <fcntl.h>
 
 /*
-TODO. #include <conio.h>¿« Sleep(200) Ω««Ë«ÿ∫∏±‚
+TODO. #include <conio.h>Ïùò Sleep(200) Ïã§ÌóòÌï¥Î≥¥Í∏∞
 */
 
 #pragma region Utils
 void SetConsole()
 {
-    // ƒ‹º÷ √¢ ¿Ã∏ß
+    // ÏΩòÏÜî Ï∞Ω Ïù¥Î¶Ñ
     SetConsoleTitle(L"G- 11, I will be in your future");
 
-    // ƒ‹º÷ √¢ ≈©±‚ º≥¡§
+    // ÏΩòÏÜî Ï∞Ω ÌÅ¨Í∏∞ ÏÑ§Ï†ï
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     COORD newSize = { 80, 25 };
     SetConsoleScreenBufferSize(hConsole, newSize);
 
-    // ƒ‹º÷ ƒøº≠ ≤Ù±‚.
+    // ÏΩòÏÜî Ïª§ÏÑú ÎÅÑÍ∏∞.
     CONSOLE_CURSOR_INFO info;
     info.bVisible = false;
     info.dwSize = 1;
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
 
-    // UTF-8 ¿Œƒ⁄µ˘ º≥¡§
+    // UTF-8 Ïù∏ÏΩîÎî© ÏÑ§Ï†ï
     SetConsoleOutputCP(CP_UTF8);
 }
 
-std::vector<int> GetConsoleSize()
+void SetWindowSize(int width, int height)
 {
     CONSOLE_SCREEN_BUFFER_INFO csbi;
-    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-    int width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-    int height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+    if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi))
+    {
+        // Make sure the new size isn't too big
+        if (height > csbi.dwSize.Y) height = csbi.dwSize.Y;
+        if (width > csbi.dwSize.X) width = csbi.dwSize.X;
 
-    return { width, height };
+        // Adjust window origin if necessary
+        if ((csbi.srWindow.Top + height) > csbi.dwSize.Y) csbi.srWindow.Top = csbi.dwSize.Y - height - 1;
+        if ((csbi.srWindow.Left + width) > csbi.dwSize.Y) csbi.srWindow.Left = csbi.dwSize.X - width - 1;
+
+        // Calculate new size
+        csbi.srWindow.Bottom = csbi.srWindow.Top + height - 1;
+        csbi.srWindow.Right = csbi.srWindow.Left + width - 1;
+
+        SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), true, &csbi.srWindow);
+    }
 }
 
-std::vector<int> GetMiddlePosition()
+void SetCursorPosition(int x, int y) 
 {
-    std::vector<int> consoleSize = GetConsoleSize();
-    int size = 0; // actorµÁ, strµÁ 
-    int x = (consoleSize[0] - size) / 2;
-    int y = consoleSize[1] / 2;
-    return { x, y };
+    COORD coord;
+    coord.X = x;
+    coord.Y = y;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
-void SetMiddlePosition(int y)
+void RenderText(std::string filePath, std::vector<int> cursorPos)
 {
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    std::vector<int> mPos = GetMiddlePosition();
+    std::ifstream file;
+    file.open(filePath);
 
-    COORD pos;
-    pos.X = mPos[0];
-    pos.Y = mPos[1] + y;
+    if (!file.is_open())
+    {
+        std::cout << "Failed to open file: " << filePath << std::endl;
+        return;
+    }
 
-    SetConsoleCursorPosition(hConsole, pos);
+    std::stringstream stream;
+    stream << file.rdbuf();
+    file.close();
+
+    std::string str = stream.str();
+    std::vector<int> movePos = cursorPos;
+
+    for (char ch : str)
+    {
+        if (ch == '\n')
+        {
+            movePos[0] = cursorPos[0];
+            ++movePos[1];
+            continue;
+        }
+
+        static HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+        COORD coord;
+        coord.X = static_cast<short>(movePos[0]);
+        coord.Y = static_cast<short>(movePos[1]);
+        SetConsoleCursorPosition(handle, coord);
+		std::cout << ch;
+        ++movePos[0];
+    }
 }
-
-void SetMiddlePosition(int x, int y)
-{
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    std::vector<int> mPos = GetMiddlePosition();
-
-    COORD pos;
-    pos.X = mPos[0] + x;
-    pos.Y = mPos[1] + y;
-
-    SetConsoleCursorPosition(hConsole, pos);
-}
-
-void SetConsoleSize(int width, int height)
-{
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	int w = static_cast<int>(width);
-	int h = static_cast<int>(height);
-    SMALL_RECT windowSize = { 0, 0, w, h };
-    SetConsoleWindowInfo(hConsole, TRUE, &windowSize);
-}
-
 #pragma endregion
+
+void musicMenu() 
+{
+	// ÌîåÎ†àÏù¥Î¶¨Ïä§Ìä∏
+	std::vector<std::string> playList = {
+		"0. bad apple",
+		"1. good apple"
+	};
+
+	SetCursorPosition(20, 9);
+	// TODO. ÌïúÍ∏Ä Íπ®Ïßê Ìï¥Í≤∞ÌïòÍ∏∞
+	std::cout << "Play Music!" << std::endl;
+
+	for ( int i = 0; i < playList.size( ); ++i ) {
+		SetCursorPosition(20, 10 + i);
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14); // Yellow color
+		std::cout << playList[ i ] << std::endl;
+	}
+}
 
 #pragma region Level
-void Intro()
+void Title()
 {
-    SetConsoleSize(45, 20);
-    // ±‚∫ª πË∞Ê π◊ ±€ææ ªˆ º≥¡§
-    system("Color f9");
-}
-#pragma endregion
+	RenderText("../Asset/Title.txt", { 0, 0 });
 
-#pragma region Menu
-void miniMenu()
-{
-    // ±‚∫ª º≥¡§
-    SetConsoleSize(20, 10);
-    system("Color E9");
-
-    // πÆ±∏ √‚∑¬
-    SetMiddlePosition(0);
-    std::cout << "1. ∞‘¿” Ω√¿€" << std::endl;
-    //SetMiddlePosition();
-    //std::cout << "2. " << std::endl;
-    SetMiddlePosition(1);
-    std::cout << "0. ∏ﬁ¥∫ ≤Ù±‚" << std::endl;
-}
-#pragma endregion
-
-void PlayMusic() 
-{
-    std::vector<std::string> playList = {
-        "1. bad apple",
-        "2. good apple"
-    };
-
-    for (int i = 0; i < playList.size(); i++)
+    for (int i = 0; i < 10; i++)
     {
-        SetMiddlePosition(i);
-        std::cout << playList[i] << std::endl;
-	}   
+        Sleep(100);
+        system("Color 06");
+        Sleep(100);
+        system("Color 09");
+        Sleep(100);
+        system("Color 0D");
 
-    char ch;
-    ch = getchar();
+        // TODO. Ï†úÎ™©Ïù¥ ÍπúÎπ°Ïù¥Îäî ÎèôÏïà, Í≤åÏûÑ ÏÑ∏Í≥ÑÍ¥Ä Ï∂úÎ†•
+    }
 
-	int musicIndex = ch - '0';
-	musicIndex = ((musicIndex < 1) || (musicIndex > 2)) ? 1 : musicIndex;
-    
-    // 2. Game Ω√¿€
-    ///////////////////////////////////
-    Game game;
-    game.prase(musicIndex);
+    // Î∂Ä Ï†úÎ™©
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { 20, 10 });
+    std::cout << "Star Wars..." << std::endl;
+
+    // Î©îÎâ¥ Ï∂úÎ†•
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { 20, 14 });
+    std::cout << "0. Game Start" << std::endl;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { 20, 15 });
+    std::cout << "1. Exit Game" << std::endl;
 }
+
+void PlayMusic( )
+{
+	system("cls");
+	Utils::SetConsoleSize(80, 25);
+	musicMenu( );
+	
+	char ch;
+
+	do {
+		ch = _getch( );
+		PlaySound(NULL, NULL, 0);
+
+		Game game;
+		int ix = ( ch == '0' || ch == '1' ) ? ( ch - '0' ) : 0;
+
+		game.parse(ix);   
+		game.play( );
+
+		musicMenu( );
+	} while ( ch == '0' || ch == '1' );
+
+	// exit back to main menu
+}
+#pragma endregion
 
 int main() {
 
+    // TODO. ÏΩòÏÜî Ï∞Ω ÏÑ§Ï†ï
     SetConsole();
+	// TODO. 16ÏúºÎ°ú 
+    //SetWindowSize(80, 25);
+	SetConsoleOutputCP(CP_UTF8);
+	//_setmode(_fileno(stdout), _O_U8TEXT);
+    
 
-    // 1) intro
-    Intro();
+    PlaySound(TEXT("../Asset/Imtr.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+
+	// TODO. Ï†ïÎ†¨ ÏÑ§Ï†ï
+	// 1) Title
+    Title();
 
     char ch;
     do 
     {
-        // 2) miniMenu
-        miniMenu();
         ch = getchar();
+        std::cin.ignore();
 
-#pragma region reset
-        system("cls");
-        system("Color f9");
-#pragma endregion
-
-        if (ch == '1') 
+        if (ch == '0') 
         {
             PlayMusic();
         }
-        /*
         else 
         {
+            system("cls");
+            system("Color 0D");
+            std::cout << "Good Bye! " << std::endl;
+			std::cout << "Press any Key to exit..." << std::endl;
+
+            _getch();
         }
-        */
+    } while (ch == '0');
 
-    } while (ch != '1');
-
-
-    std::cin.get();
     return 0;
 }

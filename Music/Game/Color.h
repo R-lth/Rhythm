@@ -1,0 +1,21 @@
+﻿#pragma once
+
+enum Color
+{
+	BLACK,
+	BLUE,
+	GREEN,
+	CYAN,
+	RED,
+	MAGENTA,
+	Orange,
+	LIGHTGRAY,
+	DARKGRAY,
+	LIGHTBLUE,
+	LIGHTGREEN,
+	LIGHTCYAN,
+	LIGHTRED,
+	LIGHTMAGENTA,
+	YELLOW,
+	WHITE
+};

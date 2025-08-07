@@ -1,13 +1,13 @@
 #pragma once
 
+#include "Utils.h"
 #include <vector>
 #include <string>
 #include <fstream>
-#include <iostream>
-// �Է�
+#include <sstream>
+// 입력
 #include < conio.h >
-// ����
-#include <Windows.h> 
+// 음악 #include <Windows.h> 
 #include <mmsystem.h>  
 #pragma comment(lib, "winmm.lib")
 
@@ -18,20 +18,23 @@ public :
 	~Game() = default;
 
 public:
-	void prase(int ix);
+	void parse(int ix);
 	void play();
 
 private:
 #pragma region for play
 	void drawGrid();
-	char getInput(char oldinput);
+	void baseNote();
 	void drawNote(int x, int y, int row);
 	void clearNote(int x, int y);
+	char getInput(char oldinput);
 #pragma endregion
+	const int errorTime = 150; // 오차 시간
+	int noteCount = 0;		   // 총 노트 개수
 
 	std::vector<char>  notes;       
-	std::vector<int>   noteRow;     
-	std::vector<float> noteLength;  
-	std::vector<float> timing;       
+	std::vector<int>   noteLane; // 행
+	std::vector<float> noteInterval;  
+	std::vector<float> timing;   // (in ms)       
 	std::vector<bool>  pressed;   
 };
