@@ -36,7 +36,7 @@ void Game::parse(int ix)
 	timing.resize(noteCount);
 	pressed.resize(noteCount, false);
 
-	// 인풋 키
+	// 그리드 열에 맞게 액터 초기화
 	for (int i = 0, tmp; i < noteCount; i++)
 	{
 		file >> tmp >> noteLane.at(i) >> noteInterval.at(i);
@@ -76,8 +76,7 @@ void Game::parse(int ix)
 	}
 #pragma endregion
 
-	// 음악 재생 (↔ playground)
-
+	// 음악 재생 초기화 (↔ playground)
 	if (ix == 0)
 	{
 		MCIERROR err = mciSendStringW(

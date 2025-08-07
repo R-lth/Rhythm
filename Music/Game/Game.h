@@ -1,10 +1,7 @@
 #pragma once
 
 #include "Utils.h"
-#include <vector>
 #include <string>
-#include <fstream>
-#include <sstream>
 // 입력
 #include < conio.h >
 // 음악 #include <Windows.h> 
@@ -33,7 +30,7 @@ private:
 	int noteCount = 0;		   // 총 노트 개수
 
 	std::vector<char>  notes;       
-	std::vector<int>   noteLane; // 행
+	std::vector<int>   noteLane; // 그리드 열
 	std::vector<float> noteInterval;  
 	std::vector<float> timing;   // (in ms)       
 	std::vector<bool>  pressed;   
