@@ -104,7 +104,7 @@ void Game::parse(int ix)
 
 	// hit 사운드 열기
 	MCIERROR err = mciSendStringW(
-		L"open \"..\\SFX\\hit.wav\" type waveaudio alias hit",
+		L"open \"..\\Asset\\SFX\\hit.wav\" type waveaudio alias hit",
 		nullptr, 0, nullptr);
 	if (err) {
 		wchar_t errBuf[128];
@@ -114,7 +114,7 @@ void Game::parse(int ix)
 
 	// miss 사운드 열기
 	err = mciSendStringW(
-		L"open \"..\\SFX\\miss.mp3\" type mpegvideo alias miss",
+		L"open \"..\\Asset\\SFX\\miss.mp3\" type mpegvideo alias miss",
 		nullptr, 0, nullptr);
 	if (err) {
 		wchar_t errBuf[128];
