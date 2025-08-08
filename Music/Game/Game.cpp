@@ -140,13 +140,11 @@ void Game::play()
 	mciSendString(L"play music", 0, 0, 0); // MCI 장치, command to play the music
 	clock_t start = clock();			   // 현재 시작 → 딱 음악이 플레이됐을 때
 
-	// TODO. 테스트로 30초 동안 플레이
-	// while (currentTime < timing.back() + 2000) // 마지막 노드로부터 2초까지
-	while (currentTime < 30000)
+	while (currentTime < timing.back() + 2000) // 마지막 노드로부터 2초까지
 	{
 		// 1. 업데이트
 		// 1. 시계 택, 프로그램 시작 이후 흘러간 틱 수 : 현재 -  시작 간격
-		// 2. 틱을 초 단위로 변환					   : 시간 간격 * 1000
+		// 2. 틱을 초 단위로 변환					   
 		// 3. 초를 밀리초(ms) 단위로 변환			   
 		currentTime = 
 			static_cast<unsigned long>(1000 * (clock() - start) 
@@ -350,8 +348,6 @@ void Game::drawNote(int x, int y, int lane)
 		Utils::printStr(color + 8, x, y - 1, "**");
 		Utils::printStr(color + 8, x - 1, y, "****");
 		Utils::printStr(color + 8, x, y + 1, "**");
-		
-		
 	}
 	else
 	{
@@ -382,6 +378,6 @@ char Game::getInput(char input)
 			return ch;
 		}
 	}
-	// 입력 대기(x)나 입력이 같으면!!
+	// 입력 대기 없거나 입력이 같으면!!
 	return '\0';
 }

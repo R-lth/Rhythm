@@ -85,7 +85,6 @@ void Utils::printStr(int color, int x, int y, std::string text)
 	SetColor(color);
 	std::cout << text;
 
-	// TODO. 리셋을 해야 지워지는 이유
 	SetColor(7); 
 }
 

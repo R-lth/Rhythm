@@ -2,15 +2,14 @@
 #include "Game.h"
 #include "Color.h"
 #include "Utils.h"
-#include <Windows.h>
-#include <iostream>
-#include <vector>
 #include <string>
 #include <io.h>
 #include <fcntl.h>
 
 /*
-TODO. #include <conio.h>의 Sleep(200) 실험해보기
+// 전체 개발 프로세스 
+TODO. ★ 1. Game 구현
+TODO. ★ 2. Game 구현한 것을 Engine로 분리
 */
 
 void musicMenu() 
@@ -22,7 +21,6 @@ void musicMenu()
 	};
 
 	Utils::SetPos(20, 9);
-	// TODO. 한글 깨짐 해결하기
 	std::cout << "Play Music!" << std::endl;
 
 	for ( int i = 0; i < playList.size( ); ++i ) {
@@ -45,8 +43,6 @@ void Title()
         system("Color 09");
         Sleep(100);
         system("Color 0D");
-
-        // TODO. 제목이 깜빡이는 동안, 게임 세계관 출력
     }
 
     // 부 제목
@@ -85,19 +81,29 @@ void PlayMusic( )
 }
 #pragma endregion
 
+void BeginPlay() 
+{
+}
+
+void Tick(float deltaTime) 
+{
+}
+
+void Render() 
+{
+}
+
 int main() {
 
-    Utils::SetConsole();
-    PlaySound(TEXT("../Asset/Imtr.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
-
-	// TODO. 정렬 설정
+    //Utils::SetConsole();
+    //PlaySound(TEXT("../Asset/Imtr.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+	/* 
     Title();
 
     char ch;
     do 
     {
-        ch = getchar();
-        std::cin.ignore();
+        ch = _getch();
 
         if (ch == '0') 
         {
@@ -112,7 +118,39 @@ int main() {
 
             _getch();
         }
-    } while (ch == '0');
+    } while (ch == '0');*/
 
+    // fPS
+	float frames = 60.0f; 
+    float fps = 1/ frames;
+
+    // delta time
+	LARGE_INTEGER frequency, prevTime, curTime;
+	QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&prevTime);
+	curTime = prevTime;
+
+    // 게임 루프 생성
+    while (true) 
+    {
+        // 게임 루프 종료 조건
+        if (true) 
+        {
+        }
+
+        // 매 프레임마다 실행되는 코드
+        QueryPerformanceCounter(&curTime);
+		float deltaTime = 
+            (curTime.QuadPart - prevTime.QuadPart) / (float)frequency.QuadPart;
+
+        if (deltaTime > fps) 
+        {
+            // TODO. 게임 루프에 현재 게임 로직 반영하기
+            BeginPlay();
+			Tick(deltaTime);
+            Render();
+        }
+    }
+    
     return 0;
 }
